@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @page {
+    size: {{ page_size }};
+    margin: 18mm 16mm 20mm;
+    background: {{ brand.colors.background }};
+    @bottom-center {
+      content: "{{ brand.shop_name }}  ·  " counter(page);
+      font-family: {{ brand.fonts.body }};
+      font-size: 8pt;
+      color: {{ brand.colors.primary }};
+    }
+  }
+  body {
+    font-family: {{ brand.fonts.body }};
+    color: {{ brand.colors.text }};
+    margin: 0;
+  }
+  h1, h2 { font-family: {{ brand.fonts.heading }}; font-weight: normal; color: {{ brand.colors.primary }}; }
+
+  /* Cover */
+  .cover {
+    height: 240mm;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    text-align: center;
+    page-break-after: always;
+  }
+  .cover h1 { font-size: 34pt; margin: 0 0 6mm; }
+  .cover .rule { width: 40mm; height: 1.5pt; background: {{ brand.colors.accent }}; margin: 0 auto 6mm; }
+  .cover p { font-size: 11pt; letter-spacing: 2pt; text-transform: uppercase; color: {{ brand.colors.primary }}; }
+
+  /* Prompt pages */
+  .prompt-page { page-break-after: always; }
+  .prompt-page:last-of-type { page-break-after: auto; }
+  .label { font-size: 8pt; letter-spacing: 2pt; text-transform: uppercase; color: {{ brand.colors.accent }}; }
+  .prompt-page h2 { font-size: 18pt; line-height: 1.35; margin: 3mm 0 10mm; }
+  .line { border-bottom: 0.75pt solid {{ brand.colors.lines }}; height: 10mm; }
+
+  .note { font-size: 8pt; color: {{ brand.colors.primary }}; text-align: center; margin-top: 8mm; }
+</style>
+</head>
+<body>
+  <section class="cover">
+    <div class="rule"></div>
+    <h1>{{ theme }}</h1>
+    <p>Guided Journal</p>
+  </section>
+
+  {% for prompt in prompts %}
+  <section class="prompt-page">
+    <div class="label">Prompt {{ loop.index }} of {{ prompts|length }}</div>
+    <h2>{{ prompt }}</h2>
+    {% for _ in range(16) %}<div class="line"></div>{% endfor %}
+    {% if loop.last %}<p class="note">{{ brand.footer_note }}</p>{% endif %}
+  </section>
+  {% endfor %}
+</body>
+</html>

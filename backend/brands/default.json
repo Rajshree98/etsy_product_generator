@@ -1,0 +1,17 @@
+{
+  "id": "default",
+  "name": "Default brand",
+  "colors": {
+    "primary": "#5B6B5A",
+    "accent": "#D9B8A3",
+    "background": "#FBF8F4",
+    "text": "#3A3A3A",
+    "lines": "#D8D2CA"
+  },
+  "fonts": {
+    "heading": "Georgia, 'Times New Roman', serif",
+    "body": "'Helvetica Neue', Arial, sans-serif"
+  },
+  "shop_name": "Your Shop Name",
+  "footer_note": "For personal reflection. Not a substitute for professional support."
+}

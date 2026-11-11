@@ -1,0 +1,214 @@
+{#- One template for every product type. Each enabled section adds one or more .page blocks.
+    Every page is a fixed-size box, so the browser preview and the PDF look the same. -#}
+{%- set pad_top, pad_x, pad_bottom = 20, 18, 22 -%}
+{%- set content_h = page_h - pad_top - pad_bottom -%}
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>{{ c.title }}</title>
+<style>
+  {% for name, file in font_faces %}
+  @font-face { font-family: "{{ name }}"; font-weight: 400; font-style: normal; src: url("{{ font_base }}{{ file }}-latin-400-normal.woff") format("woff"); }
+  @font-face { font-family: "{{ name }}"; font-weight: 600; font-style: normal; src: url("{{ font_base }}{{ file }}-latin-600-normal.woff") format("woff"); }
+  @font-face { font-family: "{{ name }}"; font-weight: 400; font-style: italic; src: url("{{ font_base }}{{ file }}-latin-400-italic.woff") format("woff"); }
+  {% endfor %}
+
+  @page { size: {{ page_w }}mm {{ page_h }}mm; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "{{ brand.fonts.body }}", sans-serif;
+    color: {{ brand.colors.text }};
+    font-size: 10.5pt;
+    line-height: 1.55;
+  }
+  {% if preview %}
+  body { background: #e7e5e4; padding: 16px 0; }
+  .page { margin: 0 auto 16px; box-shadow: 0 2px 10px rgba(0,0,0,.12); }
+  {% endif %}
+
+  .page {
+    position: relative;
+    width: {{ page_w }}mm;
+    height: {{ page_h - 0.5 }}mm;  /* a hair under the sheet so the PDF never spills a blank page */
+    padding: {{ pad_top }}mm {{ pad_x }}mm {{ pad_bottom }}mm;
+    background: {{ brand.colors.background }};
+    overflow: hidden;
+    page-break-after: always;
+  }
+  .page:last-child { page-break-after: auto; }
+  .footer {
+    position: absolute; left: 0; right: 0; bottom: 9mm;
+    text-align: center; font-size: 7.5pt; letter-spacing: .5pt;
+    color: {{ brand.colors.primary }}; opacity: .8;
+  }
+
+  h1, h2, h3 {
+    font-family: "{{ brand.fonts.heading }}", serif;
+    font-weight: 600; color: {{ brand.colors.primary }}; margin: 0;
+  }
+  .label {
+    font-size: 7.5pt; letter-spacing: 2.5pt; text-transform: uppercase;
+    color: {{ brand.colors.accent }}; font-weight: 600;
+  }
+  .rule { width: 36mm; height: 1.2pt; background: {{ brand.colors.accent }}; }
+  .line { border-bottom: .7pt solid {{ brand.colors.lines }}; height: 11mm; }
+  .box {
+    border: .8pt solid {{ brand.colors.lines }}; border-radius: 3mm;
+    background: rgba(255,255,255,.45);
+  }
+  table.grid { width: 100%; border-collapse: separate; border-spacing: 3mm; margin: 0 -3mm; table-layout: fixed; }
+  table.grid td { vertical-align: top; padding: 3mm 4mm; }
+  .muted { color: {{ brand.colors.primary }}; opacity: .85; }
+
+  /* Cover */
+  .cover { text-align: center; }
+  .cover .inner { position: absolute; left: {{ pad_x }}mm; right: {{ pad_x }}mm; top: {{ (page_h * 0.36) | round(1) }}mm; }
+  .cover .rule { margin: 0 auto 8mm; }
+  .cover h1 { font-size: 38pt; line-height: 1.1; margin-bottom: 6mm; }
+  .cover .subtitle { font-size: 12pt; font-style: italic; }
+  .cover .shop { position: absolute; left: 0; right: 0; bottom: 24mm; }
+
+  /* Intro & closing */
+  .prose h2 { font-size: 22pt; margin: 4mm 0 8mm; }
+  .prose p { margin: 0 0 5mm; font-size: 11pt; }
+  .closing .inner { position: absolute; left: 28mm; right: 28mm; top: {{ (page_h * 0.3) | round(1) }}mm; text-align: center; }
+  .closing p { font-size: 12pt; font-style: italic; line-height: 1.7; }
+  .closing .note { font-size: 8pt; font-style: normal; margin-top: 14mm; }
+
+  /* Journal prompt page */
+  .prompt h2 { font-size: 17pt; line-height: 1.3; margin: 3mm 0 7mm; min-height: 15mm; }
+
+  /* Worksheet */
+  .worksheet h2 { font-size: 22pt; margin: 3mm 0 2mm; }
+  .worksheet .instructions { font-style: italic; margin: 0 0 6mm; }
+  .worksheet .q { font-weight: 600; font-size: 10pt; margin: 0 0 2mm; color: {{ brand.colors.primary }}; }
+  .worksheet .box { margin-bottom: 5mm; }
+
+  /* Planner */
+  .planner h2 { font-size: 22pt; margin: 3mm 0 1mm; }
+  .planner .day { font-family: "{{ brand.fonts.heading }}", serif; font-weight: 600; color: {{ brand.colors.primary }}; font-size: 11pt; }
+  table.habits { width: 100%; border-collapse: collapse; table-layout: fixed; margin-bottom: 8mm; }
+  table.habits th, table.habits td { border: .6pt solid {{ brand.colors.lines }}; height: 10.5mm; text-align: center; font-size: 7pt; font-weight: 400; }
+  table.habits th.name, table.habits td.name { width: 38mm; text-align: left; padding-left: 2mm; font-size: 8.5pt; }
+  table.habits thead th { background: rgba(255,255,255,.5); color: {{ brand.colors.primary }}; }
+
+  /* Affirmations */
+  .affirm h2 { font-size: 22pt; margin: 3mm 0 4mm; }
+  .affirm td { text-align: center; vertical-align: middle !important; font-family: "{{ brand.fonts.heading }}", serif; font-style: italic; font-size: 13pt; color: {{ brand.colors.primary }}; }
+</style>
+</head>
+<body>
+{%- macro footer() -%}<div class="footer">{{ brand.shop_name }}</div>{%- endmacro %}
+
+{% if "cover" in sections %}
+<section class="page cover">
+  <div class="inner">
+    <div class="rule"></div>
+    <h1>{{ c.title }}</h1>
+    {% if c.subtitle %}<div class="subtitle muted">{{ c.subtitle }}</div>{% endif %}
+  </div>
+  {% if brand.shop_name %}<div class="shop label">{{ brand.shop_name }}</div>{% endif %}
+</section>
+{% endif %}
+
+{% if "intro" in sections and c.intro %}
+<section class="page prose">
+  <div class="label">Welcome</div>
+  <h2>How to use this {{ "journal" if "journal" in sections else "workbook" if "worksheets" in sections else "planner" }}</h2>
+  {% for para in c.intro.split("\n\n") if para.strip() %}<p>{{ para.strip() }}</p>{% endfor %}
+  {{ footer() }}
+</section>
+{% endif %}
+
+{% if "journal" in sections %}
+{% set n_lines = ((content_h - 34) / 11) | int %}
+{% for prompt in c.journal_prompts %}
+<section class="page prompt">
+  <div class="label">Prompt {{ loop.index }} of {{ c.journal_prompts | length }}</div>
+  <h2>{{ prompt }}</h2>
+  {% for _ in range(n_lines) %}<div class="line"></div>{% endfor %}
+  {{ footer() }}
+</section>
+{% endfor %}
+{% endif %}
+
+{% if "worksheets" in sections %}
+{% for ws in c.worksheets %}
+{% set nq = [ws.questions | length, 1] | max %}
+{% set box_h = ((content_h - 48) / nq - 12) | round(1) %}
+<section class="page worksheet">
+  <div class="label">Worksheet {{ loop.index }}</div>
+  <h2>{{ ws.title }}</h2>
+  {% if ws.instructions %}<p class="instructions muted">{{ ws.instructions }}</p>{% endif %}
+  {% for q in ws.questions %}
+  <div class="q">{{ q }}</div>
+  <div class="box" style="height: {{ box_h }}mm"></div>
+  {% endfor %}
+  {{ footer() }}
+</section>
+{% endfor %}
+{% endif %}
+
+{% if "weekly_planner" in sections %}
+{% set cell_h = ((content_h - 30) / 4 - 3) | round(1) %}
+{% set days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday", "Notes & intentions"] %}
+<section class="page planner">
+  <div class="label">Weekly planner</div>
+  <h2>Week of ____________</h2>
+  <table class="grid" style="margin-top: 3mm">
+    {% for row in days | batch(2) %}
+    <tr>{% for d in row %}<td class="box" style="height: {{ cell_h }}mm"><div class="day">{{ d }}</div></td>{% endfor %}</tr>
+    {% endfor %}
+  </table>
+  {{ footer() }}
+</section>
+{% endif %}
+
+{% if "habit_tracker" in sections and c.habits %}
+<section class="page planner">
+  <div class="label">Habit tracker</div>
+  <h2>Month of ____________</h2>
+  <p class="muted" style="margin: 2mm 0 6mm">Colour in a square each day you show up for yourself. Gaps are part of it.</p>
+  {% for start, end in [(1, 16), (17, 31)] %}
+  <table class="habits">
+    <thead><tr><th class="name">Habit</th>{% for d in range(start, end + 1) %}<th>{{ d }}</th>{% endfor %}{% if end == 31 %}<th></th>{% endif %}</tr></thead>
+    <tbody>
+    {% for h in c.habits %}<tr><td class="name">{{ h }}</td>{% for d in range(start, end + 1) %}<td></td>{% endfor %}{% if end == 31 %}<td></td>{% endif %}</tr>{% endfor %}
+    </tbody>
+  </table>
+  {% endfor %}
+  {{ footer() }}
+</section>
+{% endif %}
+
+{% if "affirmations" in sections and c.affirmations %}
+{% for chunk in c.affirmations | batch(10) %}
+{% set rows = ((chunk | length) / 2) | round(0, "ceil") | int %}
+{% set cell_h = ((content_h - 30) / 5 - 3) | round(1) %}
+<section class="page affirm">
+  <div class="label">Affirmations</div>
+  <h2>Words to return to</h2>
+  <table class="grid">
+    {% for row in chunk | batch(2) %}
+    <tr>{% for a in row %}<td class="box" style="height: {{ cell_h }}mm">{{ a }}</td>{% endfor %}</tr>
+    {% endfor %}
+  </table>
+  {{ footer() }}
+</section>
+{% endfor %}
+{% endif %}
+
+{% if "closing" in sections %}
+<section class="page closing">
+  <div class="inner">
+    <div class="rule" style="margin: 0 auto 10mm"></div>
+    {% if c.closing %}<p>{{ c.closing }}</p>{% endif %}
+    {% if brand.footer_note %}<p class="note muted">{{ brand.footer_note }}</p>{% endif %}
+  </div>
+  {{ footer() }}
+</section>
+{% endif %}
+</body>
+</html>

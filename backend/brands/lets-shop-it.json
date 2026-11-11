@@ -1,0 +1,14 @@
+{
+  "id": "lets-shop-it",
+  "name": "let's shop it",
+  "shop_name": "let's shop it",
+  "colors": {
+    "primary": "#5B6B5A",
+    "accent": "#C99A7D",
+    "background": "#FBF8F4",
+    "text": "#3A3A3A",
+    "lines": "#D8D2CA"
+  },
+  "fonts": { "heading": "Cormorant Garamond", "body": "Nunito" },
+  "footer_note": "For personal reflection. Not a substitute for professional support."
+}

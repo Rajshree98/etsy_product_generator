@@ -1,0 +1,14 @@
+{
+  "id": "calm-the-quest",
+  "name": "Calm the Quest",
+  "shop_name": "Calm the Quest",
+  "colors": {
+    "primary": "#3F5872",
+    "accent": "#8FB3C9",
+    "background": "#F6F8FA",
+    "text": "#2F3640",
+    "lines": "#CCD6E0"
+  },
+  "fonts": { "heading": "Lora", "body": "DM Sans" },
+  "footer_note": "For personal reflection. Not a substitute for professional support."
+}
